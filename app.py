@@ -202,7 +202,9 @@ with tabs[0]:
     )
 
     st.divider()    
-
+    st.subheader("DEBUG: Data before chart")
+    st.write(df[["Date", "Close"]].head())
+    st.write(df[["Date", "Close"]].tail())
     fig_price = price_ma_chart(df, selected_stock)
     if fig_price:
         st.plotly_chart(fig_price, use_container_width=True)
@@ -217,6 +219,7 @@ with tabs[0]:
 
     filtered_df = filter_by_start_date(df, start_date)
 
+    st.subheader("DEBUG: Data before chart")
     
 
     fig_volume = volume_chart(filtered_df)

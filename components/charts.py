@@ -1,6 +1,6 @@
 import pandas as pd
 import plotly.graph_objects as go
-
+import streamlit as st
 
 
 
@@ -62,7 +62,9 @@ def price_ma_chart(df: pd.DataFrame, stock: str):
         df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
 
     df = df.sort_values("Date")
-
+    st.subheader("DEBUG: Data inside chart function")
+    st.write(df[["Date", "Close"]].head())
+    st.write(df[["Date", "Close"]].tail())
     fig = go.Figure()
 
     # Price line
@@ -104,7 +106,9 @@ def volume_chart(df: pd.DataFrame):
         return None
 
     agg_df, freq_label, overall_avg = aggregate_volume_by_range(df)
-
+    st.subheader("DEBUG: Data inside chart function")
+    st.write(df[["Date", "Close"]].head())
+    st.write(df[["Date", "Close"]].tail())
     fig = go.Figure()
 
     # Bars
@@ -149,7 +153,9 @@ def returns_chart(df: pd.DataFrame):
         return None
 
     returns = df["Close"].pct_change()
-
+    st.subheader("DEBUG: Data inside chart function")
+    st.write(df[["Date", "Close"]].head())
+    st.write(df[["Date", "Close"]].tail())
     fig = go.Figure(
         go.Scatter(
             x=df["Date"],
@@ -175,7 +181,9 @@ def returns_chart(df: pd.DataFrame):
 def forecast_chart(df, forecast_df, stock):
     if df.empty or forecast_df.empty:
         return None
-
+    st.subheader("DEBUG: Data inside chart function")
+    st.write(df[["Date", "Close"]].head())
+    st.write(df[["Date", "Close"]].tail())
     fig = go.Figure()
 
     # Historical price
