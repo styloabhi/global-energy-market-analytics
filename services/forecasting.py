@@ -1,44 +1,48 @@
-import pandas as pd
 import numpy as np
-from statsmodels.tsa.holtwinters import ExponentialSmoothing
+import pandas as pd
 
 def powerbi_style_forecast(
     df: pd.DataFrame,
     horizon_days: int = 30,
+    alpha: float = 0.3,
+    beta: float = 0.1,
     confidence: float = 0.80
 ) -> pd.DataFrame:
-    """
-    Power BI–style ETS forecast with confidence bands.
-    """
 
-    if df is None or df.empty or len(df) < 90:
+    if df is None or df.empty or len(df) < 60:
         return pd.DataFrame()
 
     df = df.sort_values("Date")
-    series = df["Close"].astype(float)
+    y = df["Close"].astype(float).values
 
-    model = ExponentialSmoothing(
-        series,
-        trend="add",
-        seasonal="add",
-        seasonal_periods=5,
-        damped_trend=True
-    )
+    # Initialize
+    level = y[0]
+    trend = y[1] - y[0]
 
-    fitted = model.fit(optimized=True)
+    levels = []
+    trends = []
 
-    forecast = fitted.forecast(horizon_days)
+    for i in range(len(y)):
+        prev_level = level
+        level = alpha * y[i] + (1 - alpha) * (level + trend)
+        trend = beta * (level - prev_level) + (1 - beta) * trend
+        levels.append(level)
+        trends.append(trend)
 
-    # -----------------------------
-    # Confidence interval
-    # -----------------------------
-    residuals = series - fitted.fittedvalues
+    # Forecast
+    forecast = [
+        level + (i + 1) * trend
+        for i in range(horizon_days)
+    ]
+
+    # Confidence band (simple, realistic)
+    residuals = y - np.array(levels)
     sigma = residuals.std()
 
     z = 1.28 if confidence == 0.80 else 1.96
 
-    upper = forecast + z * sigma
-    lower = forecast - z * sigma
+    upper = np.array(forecast) + z * sigma
+    lower = np.array(forecast) - z * sigma
 
     future_dates = pd.date_range(
         start=df["Date"].iloc[-1] + pd.Timedelta(days=1),
@@ -48,7 +52,7 @@ def powerbi_style_forecast(
 
     return pd.DataFrame({
         "Date": future_dates,
-        "Forecast": forecast.values,
-        "Upper": upper.values,
-        "Lower": lower.values
+        "Forecast": forecast,
+        "Upper": upper,
+        "Lower": lower
     })

@@ -26,7 +26,7 @@ def aggregate_volume_by_range(df):
 
     else:
         agg = (
-            df.resample("ME", on="Date")
+            df.resample("M", on="Date")
             .agg(
                 Volume=("Volume", "mean")  # 🔥 avg daily volume
             )
