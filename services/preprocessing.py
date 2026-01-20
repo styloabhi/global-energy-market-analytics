@@ -25,7 +25,8 @@ def preprocess_price_data(df: pd.DataFrame) -> pd.DataFrame:
         return pd.DataFrame()
 
     df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
-
+    if df["Date"].dt.tz is not None:
+        df["Date"] = df["Date"].dt.tz_convert(None)
     # ----------------------------------
     # 3️⃣ Ensure OHLC columns exist
     # ----------------------------------
