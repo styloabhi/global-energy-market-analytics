@@ -364,4 +364,3 @@ def revenue_profit_chart(df: pd.DataFrame, stock: str, frequency: str):
 
 
     return fig
-
